@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>오늘의 밸런스</title>
+  <!-- 카카오 SDK 로드 -->
+  <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg-color: #f3f4f6;
+      --text-color: #1f2937;
+      --btn-a-color: #3b82f6; /* Blue */
+      --btn-b-color: #ef4444; /* Red */
+      --btn-a-hover: #2563eb;
+      --btn-b-hover: #dc2626;
+      --card-bg: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      padding: 20px;
+      margin: 0;
+    }
+
+    .layout-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 24px;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      min-height: calc(100vh - 40px);
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px; /* Mobile first */
+      background: var(--card-bg);
+      border-radius: 24px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      margin-top: 2rem;
+      flex-shrink: 0;
+    }
+
+    header {
+      text-align: center;
+      padding: 24px 20px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+
+    h1.logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #111827;
+    }
+
+    .content-area {
+      padding: 32px 24px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .question-box {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .question-box h2 {
+      font-size: 1.35rem;
+      font-weight: 800;
+      line-height: 1.4;
+      word-break: keep-all;
+      color: #1f2937;
+    }
+
+    /* Voting View */
+    .vote-view {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .vote-btn {
+      width: 100%;
+      padding: 24px 20px;
+      border: none;
+      border-radius: 20px;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s, filter 0.2s;
+      word-break: keep-all;
+      line-height: 1.3;
+    }
+
+    .vote-btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-a {
+      background-color: var(--btn-a-color);
+      box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
+    }
+    
+    .btn-a:hover {
+      background-color: var(--btn-a-hover);
+    }
+
+    .btn-b {
+      background-color: var(--btn-b-color);
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-b:hover {
+      background-color: var(--btn-b-hover);
+    }
+
+    .vs-badge {
+      text-align: center;
+      font-weight: 800;
+      color: #d1d5db;
+      font-size: 1.125rem;
+      margin: 4px 0;
+    }
+
+    /* Results View */
+    .result-view {
+      display: none;
+      flex-direction: column;
+      gap: 24px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stat-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .stat-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .stat-header .option-text {
+      flex: 1;
+      padding-right: 12px;
+      line-height: 1.3;
+    }
+
+    .stat-header .percent {
+      font-size: 1.25rem;
+      font-weight: 800;
+    }
+
+    .progress-bg {
+      width: 100%;
+      height: 24px;
+      background-color: #f3f4f6;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      border-radius: 12px;
+      width: 0%; /* Will be set via JS */
+      transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .progress-a {
+      background-color: var(--btn-a-color);
+    }
+
+    .progress-b {
+      background-color: var(--btn-b-color);
+    }
+
+    .my-pick-badge {
+      font-size: 0.75rem;
+      font-weight: 800;
+      background-color: #111827;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 12px;
+      margin-left: 8px;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    .share-btn {
+      margin-top: 16px;
+      width: 100%;
+      padding: 16px;
+      background-color: #fee500; /* Kakao yellow */
+      color: #000000;
+      border: none;
+      border-radius: 16px;
+      font-size: 1rem;
+      font-weight: 800;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 10px rgba(254, 229, 0, 0.3);
+      transition: transform 0.1s, background-color 0.2s;
+    }
+
+    .share-btn:active {
+      transform: scale(0.98);
+    }
+
+    .share-btn:hover {
+      background-color: #f4dc00;
+    }
+
+    /* Ad Placeholders */
+    .ad-placeholder {
+      background-color: #f3f4f6;
+      color: #9ca3af;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: 700;
+      border-radius: 16px;
+      text-align: center;
+      border: 2px dashed #d1d5db;
+    }
+
+    .ad-small {
+      width: 100%;
+      height: 60px;
+    }
+
+    .ad-large {
+      width: 100%;
+      height: 250px;
+    }
+
+    .ad-skyscraper {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Side Ads */
+    .side-ad-container {
+      display: none; /* 모바일에서는 숨김 */
+      width: 160px;
+      height: 600px;
+      position: sticky;
+      top: 2rem;
+      flex-shrink: 0;
+      margin-top: 2rem;
+    }
+
+    /* 화면이 넓어지면 양옆 광고 표시 (160 + 24 + 480 + 24 + 160 = 848px + 여백) */
+    @media (min-width: 900px) {
+      .side-ad-container {
+        display: block;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layout-wrapper">
+    <!-- 좌측 빈 공간 윙배너 광고 -->
+    <div class="side-ad-container">
+      <div class="ad-placeholder ad-skyscraper">좌측 윙배너 광고</div>
+    </div>
+
+    <div class="container">
+      <header>
+      <h1 class="logo">오늘의 밸런스 ⚖️</h1>
+    </header>
+
+    <div class="content-area">
+      <div class="question-box">
+        <h2 id="question-text">질문을 불러오는 중...</h2>
+      </div>
+
+      <!-- Voting Screen -->
+      <div class="vote-view" id="vote-view">
+        <div class="ad-placeholder ad-small">광고 영역 (상단 배너)</div>
+        <button class="vote-btn btn-a" id="btn-a" onclick="handleVote('A')">선택지 A</button>
+        <div class="vs-badge">VS</div>
+        <button class="vote-btn btn-b" id="btn-b" onclick="handleVote('B')">선택지 B</button>
+      </div>
+
+      <!-- Result Screen -->
+      <div class="result-view" id="result-view">
+        
+        <div class="stat-row">
+          <div class="stat-header">
+            <span class="option-text" id="result-text-a">선택지 A</span>
+            <span class="percent" id="percent-a" style="color: var(--btn-a-color);">0%</span>
+          </div>
+          <div class="progress-bg">
+            <div class="progress-bar progress-a" id="bar-a"></div>
+          </div>
+        </div>
+
+        <div class="stat-row">
+          <div class="stat-header">
+            <span class="option-text" id="result-text-b">선택지 B</span>
+            <span class="percent" id="percent-b" style="color: var(--btn-b-color);">0%</span>
+          </div>
+          <div class="progress-bg">
+            <div class="progress-bar progress-b" id="bar-b"></div>
+          </div>
+        </div>
+
+        <div class="ad-placeholder ad-large">광고 영역 (전면/큰 배너)</div>
+
+        <button class="share-btn" onclick="shareToKakao()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3C6.477 3 2 6.556 2 10.942C2 13.785 3.864 16.275 6.643 17.653L5.753 20.893C5.665 21.214 6.035 21.465 6.315 21.282L10.224 18.736C10.803 18.825 11.396 18.884 12 18.884C17.523 18.884 22 15.328 22 10.942C22 6.556 17.523 3 12 3Z"/>
+          </svg>
+          친구에게 이 질문 공유하기
+        </button>
+      </div>
+    </div>
+  </div>
+
+    <!-- 우측 빈 공간 윙배너 광고 -->
+    <div class="side-ad-container">
+      <div class="ad-placeholder ad-skyscraper">우측 윙배너 광고</div>
+    </div>
+  </div>
+
+  <script>
+    // 카카오 SDK 초기화 (여기에 본인의 JavaScript 키 입력)
+    try {
+      Kakao.init('YOUR_KAKAO_JS_KEY'); 
+    } catch(e) {
+      console.warn("카카오 SDK 초기화 에러:", e);
+    }
+    
+    // 사용자가 선택한 항목 텍스트 저장용
+    let myChoiceText = "";
+
+    // 하드코딩된 병맛 밸런스 게임 질문 배열 (총 10개)
+    const questions = [
+      { q: "평생 양치 안 하기 vs 평생 샤워 안 하기", a: "평생 양치 안 하기", b: "평생 샤워 안 하기" },
+      { q: "100% 확률로 100만원 받기 vs 10% 확률로 100억원 받기", a: "100% 확률로 100만원 받기", b: "10% 확률로 100억원 받기" },
+      { q: "한여름에 패딩 입고 살기 vs 한겨울에 반팔 입고 살기", a: "한여름에 패딩 입고 살기", b: "한겨울에 반팔 입고 살기" },
+      { q: "탄산 없는 미지근한 콜라 마시기 vs 치즈 없는 퍽퍽한 피자 먹기", a: "탄산 없는 미지근한 콜라 마시기", b: "치즈 없는 퍽퍽한 피자 먹기" },
+      { q: "평생 스마트폰 없이 살기 vs 평생 친구 없이 살기", a: "평생 스마트폰 없이 살기", b: "평생 친구 없이 살기" },
+      { q: "바퀴벌레맛 초콜릿 먹기 vs 초콜릿맛 바퀴벌레 먹기", a: "바퀴벌레맛 초콜릿 먹기", b: "초콜릿맛 바퀴벌레 먹기" },
+      { q: "과거로 돌아가서 비트코인 사기 vs 미래로 가서 이번주 로또 번호 알아오기", a: "과거로 돌아가서 비트코인 사기", b: "미래로 가서 이번주 로또 번호 알아오기" },
+      { q: "머리 안 감고 일주일 버티기 vs 양치 안 하고 일주일 버티기", a: "머리 안 감고 일주일 버티기", b: "양치 안 하고 일주일 버티기" },
+      { q: "재채기할 때마다 방귀 뀌기 vs 방귀 뀔 때마다 트림하기", a: "재채기할 때마다 방귀 뀌기", b: "방귀 뀔 때마다 트림하기" },
+      { q: "평생 라면만 먹기 vs 평생 치킨 안 먹기", a: "평생 라면만 먹기", b: "평생 치킨 안 먹기" }
+    ];
+
+    // 매일 자정에 초기화되는 로직을 위해 오늘 날짜(YYYY-MM-DD)를 가져옴
+    function getTodayString() {
+      const now = new Date();
+      return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+    }
+
+    // 오늘의 질문 가져오기 (날짜를 시드로 사용하여 하루 종일 같은 질문이 나오도록)
+    function getDailyQuestion(today) {
+      // 간단한 해시 함수로 날짜 문자열을 인덱스로 변환
+      let hash = 0;
+      for (let i = 0; i < today.length; i++) {
+        hash = today.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const index = Math.abs(hash) % questions.length;
+      return questions[index];
+    }
+
+    const todayStr = getTodayString();
+    const currentQuestion = getDailyQuestion(todayStr);
+    
+    // UI 초기화
+    document.getElementById('question-text').innerText = currentQuestion.q;
+    document.getElementById('btn-a').innerText = currentQuestion.a;
+    document.getElementById('btn-b').innerText = currentQuestion.b;
+    document.getElementById('result-text-a').innerText = currentQuestion.a;
+    document.getElementById('result-text-b').innerText = currentQuestion.b;
+
+    // 로컬 스토리지 확인 (오늘 이미 투표했는지)
+    const savedVoteStr = localStorage.getItem('daily_balance_game_vote');
+    const savedVote = savedVoteStr ? JSON.parse(savedVoteStr) : null;
+
+    if (savedVote && savedVote.date === todayStr) {
+      // 이미 투표한 경우 바로 결과 화면 표시
+      document.getElementById('vote-view').style.display = 'none';
+      document.getElementById('result-view').style.display = 'flex';
+      myChoiceText = savedVote.choice === 'A' ? currentQuestion.a : currentQuestion.b;
+      showResults(savedVote.choice, savedVote.percentA, savedVote.percentB);
+    }
+
+    function showResults(choice, percentA, percentB) {
+      // 내가 선택한 항목에 뱃지 추가
+      const myPickBadge = '<span class="my-pick-badge">내 선택</span>';
+      if (choice === 'A') {
+        document.getElementById('result-text-a').innerHTML = currentQuestion.a + myPickBadge;
+      } else {
+        document.getElementById('result-text-b').innerHTML = currentQuestion.b + myPickBadge;
+      }
+
+      // 애니메이션 적용을 위해 약간의 지연 후 스타일 적용
+      setTimeout(() => {
+        // 숫자 업데이트
+        document.getElementById('percent-a').innerText = `${percentA}%`;
+        document.getElementById('percent-b').innerText = `${percentB}%`;
+        
+        // 게이지 바 애니메이션 트리거
+        document.getElementById('bar-a').style.width = `${percentA}%`;
+        document.getElementById('bar-b').style.width = `${percentB}%`;
+      }, 50);
+    }
+
+    function handleVote(choice) {
+      // 투표 화면 숨기고 결과 화면 표시
+      document.getElementById('vote-view').style.display = 'none';
+      document.getElementById('result-view').style.display = 'flex';
+
+      // 랜덤 통계 생성 (합쳐서 100%)
+      const percentA = Math.floor(Math.random() * 71) + 15; // 15% ~ 85% 사이의 리얼한 확률 생성
+      const percentB = 100 - percentA;
+
+      myChoiceText = choice === 'A' ? currentQuestion.a : currentQuestion.b;
+
+      // 로컬 스토리지에 투표 데이터 저장 (내일 자정까지 유지됨)
+      localStorage.setItem('daily_balance_game_vote', JSON.stringify({
+        date: todayStr,
+        choice: choice,
+        percentA: percentA,
+        percentB: percentB
+      }));
+
+      showResults(choice, percentA, percentB);
+    }
+
+    function shareToKakao() {
+      if (!Kakao.isInitialized()) {
+        alert("카카오 SDK가 초기화되지 않았습니다. 코드에서 'YOUR_KAKAO_JS_KEY'를 실제 키로 변경해주세요.");
+        return;
+      }
+
+      const shareMessage = `나는 [${myChoiceText}] 골랐음 ㅋㅋ 너는 뭐 고를래?`;
+      
+      Kakao.Share.sendDefault({
+        objectType: 'feed',
+        content: {
+          title: '오늘의 밸런스 게임 ⚖️',
+          description: shareMessage,
+          imageUrl: 'https://via.placeholder.com/800x400/fee500/000000.png?text=Balance+Game', // 썸네일 이미지 (변경 필요)
+          link: {
+            mobileWebUrl: window.location.href,
+            webUrl: window.location.href,
+          },
+        },
+        buttons: [
+          {
+            title: '나도 투표하기',
+            link: {
+              mobileWebUrl: window.location.href,
+              webUrl: window.location.href,
+            },
+          },
+        ],
+      });
+    }
+  </script>
+</body>
+</html>
