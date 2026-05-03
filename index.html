@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>오늘의 밸런스</title>
   <!-- 카카오 SDK 로드 -->
   <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" crossorigin="anonymous"></script>
+  <!-- 구글 애드센스 스크립트 (ca-pub-XXXXXXXXXXXXXXXX 부분은 본인 ID로 변경) -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+    crossorigin="anonymous"></script>
   <style>
     :root {
       --bg-color: #f3f4f6;
       --text-color: #1f2937;
-      --btn-a-color: #3b82f6; /* Blue */
-      --btn-b-color: #ef4444; /* Red */
+      --btn-a-color: #3b82f6;
+      /* Blue */
+      --btn-b-color: #ef4444;
+      /* Red */
       --btn-a-hover: #2563eb;
       --btn-b-hover: #dc2626;
       --card-bg: #ffffff;
@@ -44,10 +50,11 @@
 
     .container {
       width: 100%;
-      max-width: 480px; /* Mobile first */
+      max-width: 480px;
+      /* Mobile first */
       background: var(--card-bg);
       border-radius: 24px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
       overflow: hidden;
       display: flex;
       flex-direction: column;
@@ -117,7 +124,7 @@
       background-color: var(--btn-a-color);
       box-shadow: 0 6px 16px rgba(59, 130, 246, 0.3);
     }
-    
+
     .btn-a:hover {
       background-color: var(--btn-a-hover);
     }
@@ -148,8 +155,15 @@
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .stat-row {
@@ -189,7 +203,8 @@
     .progress-bar {
       height: 100%;
       border-radius: 12px;
-      width: 0%; /* Will be set via JS */
+      width: 0%;
+      /* Will be set via JS */
       transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
     }
 
@@ -217,7 +232,8 @@
       margin-top: 16px;
       width: 100%;
       padding: 16px;
-      background-color: #fee500; /* Kakao yellow */
+      background-color: #fee500;
+      /* Kakao yellow */
       color: #000000;
       border: none;
       border-radius: 16px;
@@ -270,7 +286,8 @@
 
     /* Side Ads */
     .side-ad-container {
-      display: none; /* 모바일에서는 숨김 */
+      display: none;
+      /* 모바일에서는 숨김 */
       width: 160px;
       height: 600px;
       position: sticky;
@@ -287,81 +304,101 @@
     }
   </style>
 </head>
+
 <body>
 
   <div class="layout-wrapper">
     <!-- 좌측 빈 공간 윙배너 광고 -->
     <div class="side-ad-container">
-      <div class="ad-placeholder ad-skyscraper">좌측 윙배너 광고</div>
+      <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
+        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
     </div>
 
     <div class="container">
       <header>
-      <h1 class="logo">오늘의 밸런스 ⚖️</h1>
-    </header>
+        <h1 class="logo">오늘의 밸런스 ⚖️</h1>
+      </header>
 
-    <div class="content-area">
-      <div class="question-box">
-        <h2 id="question-text">질문을 불러오는 중...</h2>
-      </div>
-
-      <!-- Voting Screen -->
-      <div class="vote-view" id="vote-view">
-        <div class="ad-placeholder ad-small">광고 영역 (상단 배너)</div>
-        <button class="vote-btn btn-a" id="btn-a" onclick="handleVote('A')">선택지 A</button>
-        <div class="vs-badge">VS</div>
-        <button class="vote-btn btn-b" id="btn-b" onclick="handleVote('B')">선택지 B</button>
-      </div>
-
-      <!-- Result Screen -->
-      <div class="result-view" id="result-view">
-        
-        <div class="stat-row">
-          <div class="stat-header">
-            <span class="option-text" id="result-text-a">선택지 A</span>
-            <span class="percent" id="percent-a" style="color: var(--btn-a-color);">0%</span>
-          </div>
-          <div class="progress-bg">
-            <div class="progress-bar progress-a" id="bar-a"></div>
-          </div>
+      <div class="content-area">
+        <div class="question-box">
+          <h2 id="question-text">질문을 불러오는 중...</h2>
         </div>
 
-        <div class="stat-row">
-          <div class="stat-header">
-            <span class="option-text" id="result-text-b">선택지 B</span>
-            <span class="percent" id="percent-b" style="color: var(--btn-b-color);">0%</span>
-          </div>
-          <div class="progress-bg">
-            <div class="progress-bar progress-b" id="bar-b"></div>
-          </div>
+        <!-- Voting Screen -->
+        <div class="vote-view" id="vote-view">
+          <!-- 상단 배너 광고 -->
+          <ins class="adsbygoogle" style="display:block;width:100%;height:60px" data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+            data-ad-slot="XXXXXXXXXX"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+          <button class="vote-btn btn-a" id="btn-a" onclick="handleVote('A')">선택지 A</button>
+          <div class="vs-badge">VS</div>
+          <button class="vote-btn btn-b" id="btn-b" onclick="handleVote('B')">선택지 B</button>
         </div>
 
-        <div class="ad-placeholder ad-large">광고 영역 (전면/큰 배너)</div>
+        <!-- Result Screen -->
+        <div class="result-view" id="result-view">
 
-        <button class="share-btn" onclick="shareToKakao()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 3C6.477 3 2 6.556 2 10.942C2 13.785 3.864 16.275 6.643 17.653L5.753 20.893C5.665 21.214 6.035 21.465 6.315 21.282L10.224 18.736C10.803 18.825 11.396 18.884 12 18.884C17.523 18.884 22 15.328 22 10.942C22 6.556 17.523 3 12 3Z"/>
-          </svg>
-          친구에게 이 질문 공유하기
-        </button>
+          <div class="stat-row">
+            <div class="stat-header">
+              <span class="option-text" id="result-text-a">선택지 A</span>
+              <span class="percent" id="percent-a" style="color: var(--btn-a-color);">0%</span>
+            </div>
+            <div class="progress-bg">
+              <div class="progress-bar progress-a" id="bar-a"></div>
+            </div>
+          </div>
+
+          <div class="stat-row">
+            <div class="stat-header">
+              <span class="option-text" id="result-text-b">선택지 B</span>
+              <span class="percent" id="percent-b" style="color: var(--btn-b-color);">0%</span>
+            </div>
+            <div class="progress-bg">
+              <div class="progress-bar progress-b" id="bar-b"></div>
+            </div>
+          </div>
+
+          <!-- 전면/큰 배너 광고 -->
+          <ins class="adsbygoogle" style="display:block;width:100%;height:250px"
+            data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+          <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+          </script>
+
+          <button class="share-btn" onclick="shareToKakao()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M12 3C6.477 3 2 6.556 2 10.942C2 13.785 3.864 16.275 6.643 17.653L5.753 20.893C5.665 21.214 6.035 21.465 6.315 21.282L10.224 18.736C10.803 18.825 11.396 18.884 12 18.884C17.523 18.884 22 15.328 22 10.942C22 6.556 17.523 3 12 3Z" />
+            </svg>
+            친구에게 이 질문 공유하기
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
     <!-- 우측 빈 공간 윙배너 광고 -->
     <div class="side-ad-container">
-      <div class="ad-placeholder ad-skyscraper">우측 윙배너 광고</div>
+      <ins class="adsbygoogle" style="display:inline-block;width:160px;height:600px"
+        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX" data-ad-slot="XXXXXXXXXX"></ins>
+      <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+      </script>
     </div>
   </div>
 
   <script>
     // 카카오 SDK 초기화 (여기에 본인의 JavaScript 키 입력)
     try {
-      Kakao.init('YOUR_KAKAO_JS_KEY'); 
-    } catch(e) {
+      Kakao.init('YOUR_KAKAO_JS_KEY');
+    } catch (e) {
       console.warn("카카오 SDK 초기화 에러:", e);
     }
-    
+
     // 사용자가 선택한 항목 텍스트 저장용
     let myChoiceText = "";
 
@@ -398,7 +435,7 @@
 
     const todayStr = getTodayString();
     const currentQuestion = getDailyQuestion(todayStr);
-    
+
     // UI 초기화
     document.getElementById('question-text').innerText = currentQuestion.q;
     document.getElementById('btn-a').innerText = currentQuestion.a;
@@ -432,7 +469,7 @@
         // 숫자 업데이트
         document.getElementById('percent-a').innerText = `${percentA}%`;
         document.getElementById('percent-b').innerText = `${percentB}%`;
-        
+
         // 게이지 바 애니메이션 트리거
         document.getElementById('bar-a').style.width = `${percentA}%`;
         document.getElementById('bar-b').style.width = `${percentB}%`;
@@ -468,7 +505,7 @@
       }
 
       const shareMessage = `나는 [${myChoiceText}] 골랐음 ㅋㅋ 너는 뭐 고를래?`;
-      
+
       Kakao.Share.sendDefault({
         objectType: 'feed',
         content: {
@@ -493,4 +530,5 @@
     }
   </script>
 </body>
+
 </html>
